@@ -1,0 +1,591 @@
+#!/bin/bash 
+ 
+echo "Enter your full name: "
+read a 
+echo "Enter your proper email id: "
+read b 
+echo "Enter your college name: "
+read c
+date=$(date)
+
+echo ""
+echo "Name: $a"
+echo "Email ID: $b"
+echo "College Name: $c"
+echo "Time and date: $date"
+echo ""
+
+# Input type of operation 
+echo "Exercises"
+echo "1. Namespace 2. DaemonSets 3.Volume 4. secret"
+echo "5. Two tier application (wordpress-mysql)"
+echo "6. Two tier application (gogs-postgres)" 
+echo "Enter Your choice: "
+read choice
+
+if [[ "${choice}" == "1" ]]
+then 
+	echo ""
+	echo "Exercises 1 Namespace"
+	echo ""
+	echo "Q1 httpd in unnati namespace"
+	echo ""
+	echo "Time and date: $date"
+	echo ""
+	
+	#!/bin/bash
+	for i in 1;do
+	ready0=`kubectl get namespace unnati | awk '{print $1}' | tail -n +2 | head -n $i` 
+	echo "Namespace => ${ready0}"
+	if [[ "${ready0}" == "unnati" ]]
+	then
+		for i in 1;do
+		ready1=`kubectl get deployments.apps httpd -n unnati| awk '{print $1}' | tail -n +2 | head -n $i` 
+		echo "Deployment name => ${ready1}"
+		if [[ "${ready1}" == "httpd" ]]
+		then
+			ready2=`kubectl get deployments.apps httpd -n unnati -o wide | awk '{print $1}' | tail -n +2 | head -n $i`
+			echo "httpd deployment image => ${ready2}"
+			if [[ "${ready2}" == "httpd" ]]
+			then
+				for b in 1; do
+				ready3=`kubectl get deployments.apps httpd -n unnati -o wide | awk '{print $2}' | tail -n +2 | head -n $i` 
+				echo "httpd deployment status => ${ready3}"
+				if [[ "${ready3}" == "1/1" ]]
+				then 
+					echo -e "\e[1;32mScore => 10 \e[0m"
+				else
+					echo -e "\e[1;31mScore => 0 \e[0m"
+				fi
+				done
+			else 
+				echo "You not use httpd image"
+				echo -e "\e[1;31mScore => 0 \e[0m"
+			fi
+		else
+			echo "You not deployed httpd name deployment"
+			echo -e "\e[1;31mScore => 0 \e[0m"
+		fi
+		done
+	else
+		echo "You not create unnati namespace"
+		echo -e "\e[1;31mScore => 0 \e[0m"
+	fi 
+	done
+
+	echo ""
+	echo "************************************************************************"
+	echo ""
+	echo "Q2 nginx"
+	echo ""
+	echo "Time and date: $date"
+	echo ""
+
+	file=/root/namespace.yml
+	if [ -f $file ]
+	then
+		for i in 1;do
+		ready4=`kubectl get namespaces opensource| awk '{print $1}' | tail -n +2 | head -n $i` 
+		echo "Namespace => ${ready4}"
+		if [[ "${ready4}" == "opensource" ]]
+		then
+			for i in 1;do
+			ready5=`kubectl get deployments.apps nginx -n opensource | awk '{print $1}' | tail -n +2 | head -n $i` 
+			echo "Deployment name => ${ready5}"
+			if [[ "${ready5}" == "nginx" ]]
+			then		
+				ready6=`kubectl get deployments.apps nginx -n opensource -o wide | awk '{print $7}' | tail -n +2 | head -n $i`
+				echo "nginx deployment image => ${ready6}"
+				if [[ "${ready6}" == "nginx" ]]
+				then	
+					for b in 1; do
+					ready7=`kubectl get deployments.apps nginx -n opensource -o wide | awk '{print $2}' | tail -n +2 | head -n $i` 
+					echo "nginx deployment status => ${ready7}"
+					if [[ "${ready7}" == "1/1" ]]
+					then 
+						echo -e "\e[1;32mScore => 10 \e[0m"
+					else
+						echo -e "\e[1;31mScore => 0 \e[0m"
+					fi
+					done
+				else 
+					echo "You not use httpd image"
+					echo -e "\e[1;31mScore => 0 \e[0m"
+				fi
+			else
+				echo "You not deployed httpd name deployment"
+				echo -e "\e[1;31mScore => 0 \e[0m"
+			fi
+			done
+		else
+			echo "You not create opensource namespace"
+			echo -e "\e[1;31mScore => 0 \e[0m"
+		fi 
+		done
+	else
+		echo "namespace.yml file does not exists"
+		echo -e "\e[1;31mScore => 0 \e[0m"
+	fi
+		
+elif [[ "${choice}" == "2" ]]
+then
+	echo ""
+	echo "Exercises 2 DaemonSets"
+	echo ""
+	for i in 1;do
+	ready8=`kubectl get daemonsets httpd -n kube-system | awk '{print $1}' | tail -n +2 | head -n $i` 
+	echo "DaemonSet name => ${ready8}"
+	if [[ "${ready8}" == "httpd" ]]
+	then
+		for f in 1;do 
+		ready9=`kubectl get daemonsets httpd -n kube-system -o wide | awk '{print $10}' | tail -n +2 | head -n $f`
+		echo "httpd daemonSet image => ${ready9}"
+		if [[ "${ready9}" == "httpd" ]]
+		then
+			for b in 1; do
+			ready9=`kubectl get daemonsets httpd -n kube-system -o wide | awk '{print $4}' | tail -n +2 | head -n $b` 
+			echo "httpd daemonSet status => ${ready9}"
+			if [[ "${ready9}" == "1" ]]
+			then 
+				echo -e "\e[1;32mScore => 10 \e[0m"
+			else
+				echo -e "\e[1;31mScore => 0 \e[0m"
+			fi
+			done
+		else 
+			echo "You not use httpd image"
+			echo -e "\e[1;31mScore => 0 \e[0m"
+		fi
+		done
+	else
+		echo "httpd name pod does not exists"
+		echo -e "\e[1;31mScore => 0 \e[0m"
+	fi
+	done
+	
+elif [[ "${choice}" == "3" ]]
+then
+	echo ""
+	echo "Exercise 3 Volume"
+	echo ""
+	echo "Time and date: $date"	
+	echo ""
+
+	file=/root/volume.yml
+	if [ -f $file ]
+	then
+		for i in 1;do
+		ready36=`kubectl get deployments.apps httpd-volume -o wide | awk '{print $1}' | tail -n +2 | head -n $i`
+		echo "Deployment name => ${ready36}"
+		if [[ "${ready36}" == "httpd-volume" ]]
+		then
+			for i in 1;do
+			ready37=`kubectl get deployments.apps httpd-volume -o wide | awk '{print $7}' | tail -n +2 | head -n $i`
+			echo "httpd-volume deployment image => ${ready37}"
+			if [[ "${ready37}" == "docker.io/httpd" ]]
+			then
+				for i in 1;do
+				ready38=`kubectl get deployments.apps httpd-volume -o wide | awk '{print $2}' | tail -n +2 | head -n $i`
+				echo "httpd-volume deployment status => ${ready38}"
+				if [[ "${ready38}" == "1/1" ]]
+				then
+					ready39=`kubectl describe deployments.apps httpd-volume| grep volume-testing:`
+					echo "Volume name => ${ready39:3:14}"
+					if [[ "${ready39:3:14}" == "volume-testing" ]]
+					then
+						ready40=`kubectl describe deployments.apps httpd-volume | grep /data | awk '{print $2}'`
+						echo "Mounted directory name => ${ready40}"
+						if [[ "${ready40}" == "/data" ]]
+						then
+							echo -e "\e[1;32mScore => 10 \e[0m"
+						else
+							echo "You not mounted /data directory"
+							echo -e "\e[1;31mScore => 0 \e[0m"
+						fi
+					else
+						echo "You not set Volume name as volume-testing"
+						echo -e "\e[1;31mScore => 0 \e[0m"
+					fi
+				else
+					echo "httpd-volume deployment is not in running state"
+					echo -e "\e[1;31mScore => 0 \e[0m"
+				fi
+				done
+			else
+				echo "You not use docker.io/httpd image for httpd-volume deployment"
+				echo -e "\e[1;31mScore => 0 \e[0m"
+			fi
+			done
+		else
+			echo "httpd-volume deployment does not exists" 
+			echo -e "\e[1;31mScore => 0 \e[0m"
+		fi
+		done
+	else
+		echo "volume.yml file does not exists"
+		echo -e "\e[1;31mScore => 0 \e[0m"
+	fi
+elif [[ "${choice}" == "4" ]]
+then
+		echo ""
+		echo "Exercise 4 Secret"
+		echo ""
+		echo "Secret with mysql-deployment"
+		echo ""
+		echo "Time and date: $date"
+		echo ""
+
+		for i in 1;do
+		ready10=`kubectl get secrets mysql-db | awk '{print $1}' | tail -n +2 | head -n $i`
+		echo "Secrets name => ${ready10}"
+		if [[ "${ready10}" == "mysql-db" ]]
+		then			
+			for i in 1;do
+			ready11=`kubectl get deployments mysql-deployment -o wide | awk '{print $1}' | tail -n +2 | head -n $i`
+			echo "Deployment name => ${ready11}"
+			if [[ "${ready11}" == "mysql-deployment" ]]
+			then
+				for i in 1;do
+				ready12=`kubectl get deployments mysql-deployment -o wide | awk '{print $7}' | tail -n +2 | head -n $i`
+				echo "mysql-deployment deployment image => ${ready12}"
+				if [[ "${ready12}" == "mysql:5.7" ]]
+				then
+					for i in 1;do
+					ready13=`kubectl get deployments mysql-deployment -o wide | awk '{print $2}' | tail -n +2 | head -n $i`
+					echo "mysql-deployment deployment status => ${ready13}"
+					if [[ "${ready13}" == "1/1" ]]
+					then	
+						ready91=`kubectl describe deployments.apps mysql-deployment |grep -o "secret 'mysql-db'" `
+						echo "checking mysql-db secret use in mysql-deployment or not => ${ready91}"
+						if [[ "${ready91}" == "secret 'mysql-db'" ]]
+						then
+							echo -e "\e[1;32mScore => 10 \e[0m"
+						else
+							echo "You not use mysql-db secret in mysql-deployment"
+							echo -e "\e[1;31mScore => 0 \e[0m"
+						fi
+					else
+						echo "mysql-deployment deployment is not in running state"
+						echo -e "\e[1;31mScore => 0 \e[0m"
+					fi
+					done	
+				else 
+					echo "You not use mysql:5.7 image"
+					echo -e "\e[1;31mScore => 0 \e[0m"
+				fi
+				done
+			else
+				echo "Deployment name mysql-deployment is not found."
+				echo -e "\e[1;31mScore => 0 \e[0m"
+			fi
+			done		
+		else
+			echo " mysql-db secret does not exists"
+			echo -e "\e[1;31mScore => 0 \e[0m"
+		fi
+		done
+elif [[ "${choice}" == "5" ]]
+then		
+
+	echo ""
+	echo "Exercise 5 Multi-tier application 1"
+	echo ""
+	echo "Deploy wordpress application and mysql in wordpress namespace"
+	echo ""
+	echo "Time and date: $date"
+	echo ""
+
+	for i in 1;do
+	ready14=`kubectl get namespace wordpress | awk '{print $1}' | tail -n +2 | head -n $i`
+	echo "Namespace name => ${ready14}"
+	if [[ "${ready14}" == "wordpress" ]]
+	then
+		for i in 1;do
+		ready15=`kubectl get secrets mysql-secret -n wordpress  | awk '{print $1}' | tail -n +2 | head -n $i`
+		echo "Secret name => ${ready15}"
+		if [[ "${ready15}" == "mysql-secret" ]]
+		then
+			echo ""
+			echo "Checking Mysql..."
+			for i in 1;do
+			ready16=`kubectl get deployments.apps mysql -n wordpress -o wide | awk '{print $1}' | tail -n +2 | head -n $i`
+			echo "Mysql deployment name => ${ready16}"
+			if [[ "${ready16}" == "mysql" ]]
+			then
+				for i in 1;do
+				ready17=`kubectl get deployments.apps mysql -n wordpress -o wide| awk '{print $7}' | tail -n +2 | head -n $i`
+				echo "Mysql image => ${ready17}"
+				if [[ "${ready17}" == "mysql:5.6" ]]
+				then
+					for i in 1;do
+					ready18=`kubectl get deployments.apps mysql -n wordpress -o wide| awk '{print $2}' | tail -n +2 | head -n $i`
+					echo "Mysql deployment Status => ${ready18}"
+					if [[ "${ready18}" == "1/1" ]]
+					then
+						for i in 1;do
+						ready19=`kubectl get svc mysql -n wordpress| awk '{print $1}' | tail -n +2 | head -n $i`
+						echo "mysql deployment service name => ${ready19}"
+						if [[ "${ready19}" == "mysql" ]]
+						then
+							for i in 1;do
+							ready20=`kubectl get svc mysql -n wordpress| awk '{print $2}' | tail -n +2 | head -n $i`
+							echo "mysql service type => ${ready20}"
+							if [[ "${ready20}" == "ClusterIP" ]]
+							then
+								ready92=`kubectl describe deployments.apps mysql -n wordpress |grep -o "secret 'mysql-secret'"`
+								echo "Checking mysql-secret is used or not => ${ready92}"
+								if [[ "${ready92}" == "secret 'mysql-secret'" ]]
+								then				
+									echo -e "\e[1;32mScore => 10 \e[0m"
+								else
+									echo "You not use mysql-secret is mysql deployment"
+									echo -e "\e[1;31mScore => 0 \e[0m"
+								fi
+							else
+								echo "Wrong service type"
+								echo "Here you need to use ClusterIP service type"
+								echo -e "\e[1;31mScore => 0 \e[0m"
+							fi
+							done
+						else
+							echo "mysql deployment service name is not set mysql"
+							echo -e "\e[1;31mScore => 0 \e[0m"
+						fi
+						done
+					else
+						echo "Mysql deployment not in running state"
+						echo -e "\e[1;31mScore => 0 \e[0m"
+					fi
+					done
+				else
+					echo "You not use mysql:5.6 image for mysql deployment"
+					echo -e "\e[1;31mScore => 0 \e[0m"
+				fi
+				done
+			else
+				echo "you not set MySQL deployment name as mysql"
+				echo -e "\e[1;31mScore => 0 \e[0m"
+			fi
+			done
+		
+			echo ""
+			echo "Checking wordpress..."
+			echo "Time and date: $date"
+			for i in 1;do
+			ready21=`kubectl get deployments.apps wordpress -n wordpress -o wide | awk '{print $1}' | tail -n +2 | head -n $i`
+			echo "wordpress deployment name => ${ready21}"
+			if [[ "${ready21}" == "wordpress" ]]
+			then
+				for i in 1;do
+				ready22=`kubectl get deployments.apps wordpress -n wordpress -o wide| awk '{print $7}' | tail -n +2 | head -n $i`
+				echo "wordpress image => ${ready22}"
+				if [[ "${ready22}" == "wordpress:4.8-apache" ]]
+				then
+					for i in 1;do
+					ready23=`kubectl get deployments.apps wordpress -n wordpress -o wide| awk '{print $2}' | tail -n +2 | head -n $i`
+					echo "wordpress deployment Status => ${ready23}"
+					if [[ "${ready23}" == "1/1" ]]
+					then
+						for i in 1;do
+						ready24=`kubectl get svc wordpress -n wordpress| awk '{print $1}' | tail -n +2 | head -n $i`
+						echo "wordpress deployment service name => ${ready24}"
+						if [[ "${ready24}" == "wordpress" ]]
+						then
+							for i in 1;do
+							ready25=`kubectl get svc wordpress -n wordpress| awk '{print $2}' | tail -n +2 | head -n $i`
+							echo "wordpress service type => ${ready25}"
+							if [[ "${ready25}" == "NodePort" ]]
+							then
+								ready93=`kubectl describe deployments.apps wordpress -n wordpress | grep -o "secret 'mysql-secret'"`
+								echo "Checking mysql-secret is used or not => ${ready93}"
+								if [[ "${ready93}" == "secret 'mysql-secret'" ]]
+								then
+									echo -e "\e[1;32mScore => 10 \e[0m"
+								else
+									echo "You not used mysql-secret in wordpress deployment"
+								fi
+							else
+								echo "Wrong service type"
+								echo "Here you need to use NodePort service type"
+								echo -e "\e[1;31mScore => 0 \e[0m"
+							fi	
+							done
+						else
+							echo "wordpress deployment service name is not set wordpress"
+							echo -e "\e[1;31mScore => 0 \e[0m"
+						fi
+						done
+					else
+						echo "wordpress deployment not in running state"
+						echo -e "\e[1;31mScore => 0 \e[0m"
+					fi
+					done
+				else
+					echo "You not use wordpress:4.8-apache image for wordpress deployment"
+					echo -e "\e[1;31mScore => 0 \e[0m"
+				fi
+				done
+			else
+				echo "you not set wordpress deployment name as wordpress"
+				echo -e "\e[1;31mScore => 0 \e[0m"
+			fi
+			done
+		else
+			echo "You not create mysql-secret secret"
+			echo -e "\e[1;31mScore => 0 \e[0m"
+		fi 
+		done
+	else
+		echo "You not create wordpress namespace"
+		echo -e "\e[1;31mScore => 0 \e[0m"
+	fi
+	done
+	echo ""
+	echo "****Final Output****"
+	if [[ "${ready92}" == "secret 'mysql-secret'" ]] && [[ "${ready93}" == "secret 'mysql-secret'" ]]
+	then
+		echo "Time and date: $date"
+		echo ""
+		echo -e "\e[1;32mWell done!! You successfully deploy wordpress.\e[0m"
+		echo -e "\e[1;32mYou got 20 out of 20 marks for this task.\e[0m"
+	else
+		echo -e "\e[1;31mTry again, You not deploy wordpress properly.\e[0m"
+	fi
+	
+elif [[ "${choice}" == "6" ]]
+then
+	echo ""
+	echo "Exercise 5 Multi-tier application 1"
+	echo ""
+	echo "Deploy gogs application and postgres database"
+	echo ""
+	echo "Time and date: $date"
+	echo ""
+
+	echo "Checking postgres database..."
+			for i in 1;do
+			ready26=`kubectl get deployments.apps postdb2 -o wide | awk '{print $1}' | tail -n +2 | head -n $i`
+			echo "postgres deployment name => ${ready26}"
+			if [[ "${ready26}" == "postdb2" ]]
+			then
+				for i in 1;do
+				ready27=`kubectl get deployments.apps postdb2 -o wide | awk '{print $7}' | tail -n +2 | head -n $i`
+				echo "postdb2 image => ${ready27}"
+				if [[ "${ready27}" == "docker.io/postgres" ]]
+				then
+					for i in 1;do
+					ready28=`kubectl get deployments.apps postdb2 -o wide | awk '{print $2}' | tail -n +2 | head -n $i`
+					echo "postdb2 deployment Status => ${ready28}"
+					if [[ "${ready28}" == "1/1" ]]
+					then
+						for i in 1;do
+						ready29=`kubectl get svc postdb2 | awk '{print $1}' | tail -n +2 | head -n $i`
+						echo "postdb2 deployment service name => ${ready29}"
+						if [[ "${ready29}" == "postdb2" ]]
+						then
+							for i in 1;do
+							ready30=`kubectl get svc postdb2 | awk '{print $2}' | tail -n +2 | head -n $i`
+							echo "postdb2 service type => ${ready30}"
+							if [[ "${ready30}" == "ClusterIP" ]]
+							then
+								echo -e "\e[1;32mScore => 10 \e[0m"
+							else
+								echo "postdb2 service type is not ClusterIP"
+								echo -e "\e[1;31mScore => 0 \e[0m"
+							fi
+							done
+						else
+							echo "postdb2 deployment service name is not set postdb2"
+							echo -e "\e[1;31mScore => 0 \e[0m"
+						fi
+						done
+					else
+						echo "postdb2 deployment not in running state"
+						echo -e "\e[1;31mScore => 0 \e[0m"
+					fi
+					done
+				else
+					echo "You not use docker.io/postgres image for postdb2 deployment"
+					echo -e "\e[1;31mScore => 0 \e[0m"
+				fi
+				done
+			else
+				echo "you not set postgres deployment name as postdb2"
+				echo -e "\e[1;31mScore => 0 \e[0m"
+			fi
+			done
+		
+			echo ""
+			echo "Checking gogs..."
+			echo "Time and date: $date"
+			for i in 1;do
+			ready31=`kubectl get deployments.apps gogs -o wide | awk '{print $1}' | tail -n +2 | head -n $i`
+			echo "gogs deployment name => ${ready31}"
+			if [[ "${ready31}" == "gogs" ]]
+			then
+				for i in 1;do
+				ready32=`kubectl get deployments.apps gogs -o wide | awk '{print $7}' | tail -n +2 | head -n $i`
+				echo "gogs image => ${ready32}"
+				if [[ "${ready32}" == "gogs/gogs" ]]
+				then
+					for i in 1;do
+					ready33=`kubectl get deployments.apps gogs -o wide | awk '{print $2}' | tail -n +2 | head -n $i`
+					echo "gogs deployment Status => ${ready33}"
+					if [[ "${ready33}" == "1/1" ]]
+					then
+						for i in 1;do
+						ready34=`kubectl get svc gogs -o wide | awk '{print $1}' | tail -n +2 | head -n $i`
+						echo "gogs deployment service name => ${ready34}"
+						if [[ "${ready34}" == "gogs" ]]
+						then
+							for i in 1;do
+							ready35=`kubectl get svc gogs -o wide | awk '{print $2}' | tail -n +2 | head -n $i`
+							echo "gogs service type => ${ready35}"
+							if [[ "${ready35}" == "NodePort" ]]
+							then
+								echo -e "\e[1;32mScore => 10 \e[0m"
+							else
+								echo "gogs service type is not set NodePort"
+								echo -e "\e[1;31mScore => 0 \e[0m"
+							fi	
+							done
+						else
+							echo "gogs deployment service name is not set gogs"
+							echo -e "\e[1;31mScore => 0 \e[0m"
+						fi
+						done
+					else
+						echo "gogs deployment not in running state"
+						echo -e "\e[1;31mScore => 0 \e[0m"
+					fi
+					done
+				else
+					echo "You not use gogs/gogs image for wordpress deployment"
+					echo -e "\e[1;31mScore => 0 \e[0m"
+				fi
+				done
+			else
+				echo "you not set gogs deployment name as gogs"
+				echo -e "\e[1;31mScore => 0 \e[0m"
+			fi
+			done
+
+	echo ""
+	echo "****Final Output****"
+	if [[ "${ready35}" == "NodePort" ]] && [[ "${ready30}" == "ClusterIP" ]]
+	then
+		echo "Time and date: $date"
+		echo ""
+		echo -e "\e[1;32mWell done!! You successfully deploy gogs.\e[0m"
+		echo -e "\e[1;32mYou got 20 out of 20 marks for this task.\e[0m"
+	else
+		echo -e "\e[1;31mTry again, You not deploy gogs properly.\e[0m"
+	fi
+else 
+	echo "choose right option"
+fi		
+		
+		
+		
+		
+		

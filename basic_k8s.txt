@@ -1,0 +1,405 @@
+#!/bin/bash 
+ 
+echo "Enter your full name: "
+read a 
+echo "Enter your proper email id: "
+read b 
+echo "Enter your college name: "
+read c
+date=$(date)
+
+echo ""
+echo "Name: $a"
+echo "Email ID: $b"
+echo "College Name: $c"
+echo "Time and date: $date"
+echo ""
+
+# Input type of operation 
+echo "Exercises"
+echo "1. Pod 2. Deployment 3. NodeSelector 4. Service" 
+echo "Enter Your choice: "
+read choice
+
+if [[ "${choice}" == "1" ]]
+then
+	echo ""
+	echo "Exercises 1 Pod"
+	echo ""
+	echo "Q1 nginx"
+	echo ""
+	echo "Time and date: $date"
+	echo ""
+	
+	ready0=`kubectl get pods -o go-template --template="{{range .items}}{{range .spec.containers}}{{.image}} {{end}}{{end}}" | awk '{print $1}'`
+	echo "Pod image => ${ready0}"
+	if [[ "${ready0}" == "nginx" ]]
+	then
+		
+		for i in 1;do
+		ready1=`kubectl get pods | awk '{print $1}' | tail -n +2 | head -n $i` 
+		echo "pod name => ${ready1:0:5}"
+		if [[ "${ready1:0:5}" == "nginx" ]]
+		then
+			
+			for b in 1; do
+			ready2=`kubectl get pods | awk '{print $3}' | tail -n +2 | head -n $b` 
+			echo "Pod status => ${ready2}"
+			if [[ "${ready2}" == "Running" ]]
+			then 
+				echo -e "\e[1;32mScore => 10 \e[0m"
+			else
+				echo -e "\e[1;31mScore => 0 \e[0m"
+			fi
+			done
+		else
+			echo "You not deployed nginx name pod"
+            echo -e "\e[1;31mScore => 0 \e[0m"
+		fi
+		done
+	else 
+		echo "You not use nginx image"
+		echo -e "\e[1;31mScore => 0 \e[0m"
+	fi
+
+	
+	echo ""
+	echo "************************************************************************"
+	echo ""
+	echo "Q2 redis"
+	echo ""
+	echo "Time and date: $date"
+	echo ""
+	
+	file=/root/redis.yml
+	if [ -f $file ]
+	then
+		ready3=`kubectl get pods -o go-template --template="{{range .items}}{{range .spec.containers}}{{.image}} {{end}}{{end}}" | awk '{print $2}'`
+		echo "Pod image => ${ready3}"
+		if [[ "${ready3}" == "redis" ]]
+		then
+			
+			for i in 1;do
+			ready4=`kubectl get pods | awk '{print $1}' | tail -n +3 | head -n $i`
+			echo "pod name => ${ready4:0:5}"
+			if [[ "${ready4:0:5}" == "redis" ]]
+			then
+				
+				for b in 1; do
+				ready5=`kubectl get pods | awk '{print $3}' | tail -n +3 | head -n $b` 
+				echo "Pod status => ${ready5}"
+				if [[ "${ready5}" == "Running" ]]
+				then
+					echo -e "\e[1;32mScore => 10 \e[0m"
+				else
+					echo "Your pod is not in running state"
+					echo -e "\e[1;31mScore => 0 \e[0m"
+				fi
+				done
+			else
+				echo "You not deployed redis name pod."
+				echo -e "\e[1;31mScore => 0 \e[0m"
+			fi
+			done
+		else 
+			echo "You not use redis image."
+			echo -e "\e[1;31mScore => 0 \e[0m"
+		fi
+		
+	else
+		echo "redis.yml doesn't exits."
+		echo -e "\e[1;31mScore => 0 \e[0m"
+	fi
+elif [[ "${choice}" == "2" ]]
+then
+		echo ""
+		echo "Exercises 2 Deployment"
+		echo ""
+		echo "Q1 httpd"
+		echo ""
+		echo "Time and date: $date"
+		echo ""
+			
+		for i in 1;do
+		ready6=`kubectl get deployments.apps httpd -o wide | awk '{print $1}' | tail -n +2 | head -n $i`
+		echo "Deployment name => ${ready6}"
+		if [[ "${ready6}" == "httpd" ]]
+		then
+			for i in 1;do
+			ready7=`kubectl get deployments.apps httpd -o wide | awk '{print $7}' | tail -n +2 | head -n $i` 
+			echo "httpd deployment image name => ${ready7}"
+			if [[ "${ready7}" == "httpd" ]]
+			then
+				for i in 1;do
+				ready8=`kubectl get deployments.apps httpd -o wide | awk '{print $2}' | tail -n +2 | head -n $i`
+				echo "httpd deployment status => ${ready8}"
+				if [[ "${ready8}" == "1/1" ]]
+				then
+					echo -e "\e[1;32mScore => 10 \e[0m"
+				else
+					echo "Pod is not in running state."
+					echo -e "\e[1;31mScore => 0 \e[0m"
+				fi
+				done			
+			else
+				echo "You not use httpd image."
+                echo -e "\e[1;31mScore => 0 \e[0m"
+			fi
+			done		
+		else
+			echo "You not set deployment name as httpd."
+			echo -e "\e[1;31mScore => 0 \e[0m"
+		fi
+		done
+
+		echo ""
+		echo "************************************************************************"
+		echo ""
+		echo "Q2 mysql"
+		echo ""
+		echo "Time and date: $date"
+		echo ""
+
+		file=/root/nginx-selector.yml
+		if [ -f $file ]
+		then
+			for i in 1;do
+			ready9=`kubectl get deployments.apps mysqldb -o wide | awk '{print $1}' | tail -n +2 | head -n $i`
+			echo "Deployment name => ${ready9}"
+			if [[ "${ready9}" == "mysqldb" ]]
+			then	
+				for i in 1;do
+				ready10=`kubectl get deployments.apps mysqldb -o wide | awk '{print $7}' | tail -n +2 | head -n $i` 
+				echo "mysqldb deployment image name => ${ready10}"
+				if [[ "${ready10}" == "mysql:5.7" ]]
+				then
+					for i in 1;do
+					ready11=`kubectl get deployments.apps mysqldb -o wide | awk '{print $2}' | tail -n +2 | head -n $i`
+					echo "mysqldb deployment status => ${ready11}"
+					if [[ "${ready11}" == "1/1" ]]
+					then 
+						echo -e "\e[1;32mScore => 10 \e[0m"
+					else
+						echo "deployment is not in running state."
+						echo -e "\e[1;31mScore => 0 \e[0m"
+					fi
+					done			
+				else
+					echo "You not set deployment name as mysqldb."
+					echo -e "\e[1;31mScore => 0 \e[0m"
+				fi
+				done		
+			else
+				echo "You not use given image."
+				echo -e "\e[1;31mScore => 0 \e[0m"
+			fi
+			done
+		else
+			echo "mysql.yml file doesn't exits."
+			echo -e "\e[1;31mScore => 0 \e[0m"
+		fi
+		
+elif [[ "${choice}" == "3" ]]
+then
+		echo ""
+		echo "Exercises 3 NodeSelector"
+		echo ""
+		echo "Q1 Nginx"
+		echo ""
+		echo "Time and date: $date"
+		echo ""
+		
+		file=/root/nginx1.yml
+		if [ -f $file ]
+		then		
+			for i in 1;do
+			ready12=`kubectl get pods | awk '{print $1}' | tail -n +2 | head -n $i` 
+			echo "Pod name => ${ready12:0:5}"
+			if [[ "${ready12:0:5}" == "nginx" ]]
+			then		
+				ready13=`kubectl get pods -o go-template --template="{{range .items}}{{range .spec.containers}}{{.image}} {{end}}{{end}}" | awk '{print $1}'`
+				echo "Pod Image => ${ready13}"
+				if [[ "${ready13}" == "nginx" ]]
+				then		
+					for i in 1; do
+					ready14=`kubectl get pods | awk '{print $3}' | tail -n +2 | head -n $i` 
+					echo "Pod status =>  ${ready14}"
+					if [[ "${ready14}" == "Running" ]]
+					then			
+						for i in 1; do
+						ready15=`kubectl get pods -o wide | awk '{print $7}' | tail -n +2 | head -n $i` 
+						if [[ "${ready15}" == "node01" ]]
+						then
+							echo "Your Pod is placed on node01 node."
+							echo -e "\e[1;32mScore => 10 \e[0m"
+						else
+							echo "Your pod is not placed on node01 node."
+							echo -e "\e[1;31mScore => 0 \e[0m"
+						fi
+						done
+					elif [[ "${ready14}" == "Pending" ]]
+					then
+						echo "Your pod is not in running state"
+						echo -e "\e[1;31mScore => 0 \e[0m"
+						
+					else
+						echo "Your pod is not in running state."
+						echo -e "\e[1;31mScore => 0 \e[0m"
+					fi
+					done
+				else
+					echo "You not use nginx image"
+					echo -e "\e[1;31mScore => 0 \e[0m"
+				fi
+			else 
+				echo "You not deployed nginx name pod"
+				echo -e "\e[1;31mScore => 0 \e[0m"
+			fi
+			done
+		else
+			echo "nginx1.yml file does not exits."
+			echo -e "\e[1;31mScore => 0 \e[0m"
+		fi
+elif  [[ "${choice}" == "4" ]]
+then
+	echo ""
+	echo "Exercise 4 Service"
+	echo ""
+	echo "super-mario game"
+	echo ""
+	echo "Time and date: $date"
+	echo ""
+	for i in 1;do
+	ready19=`kubectl get deployments.apps mario -o wide | awk '{print $1}' | tail -n +2 | head -n $i`
+	echo "Deployment name = ${ready19}"
+	if [[ "${ready19}" == "mario" ]]
+	then
+		for i in 1;do
+		ready20=`kubectl get deployments.apps mario -o wide| awk '{print $7}' | tail -n +2 | head -n $i` 
+		echo "mario deployment image name = ${ready20}"
+		if [[ "${ready20}" == "docker.io/pengbai/docker-supermario" ]]
+		then
+			for i in 1;do
+			ready21=`kubectl get svc mario | awk '{print $1}' | tail -n +2 | head -n $i`
+			echo "Service name = ${ready21}"
+			if [[ "${ready21}" == "mario" ]]
+			then			
+				for i in 1;do
+				ready22=`kubectl get svc mario | awk '{print $2}' | tail -n +2 | head -n $i`
+				echo "Service Type = ${ready22}"
+				if [[ "${ready22}" == "NodePort" ]]
+				then
+					for i in 1;do
+					ready23=`kubectl get svc mario | awk '{print $5}' | tail -n +2 | head -n $i`
+					echo "Service port = ${ready23:0:4}"
+					if [[ "${ready23:0:4}" == "8080" ]]
+					then
+						for i in 1;do
+						ready24=`kubectl get deployments.apps mario -o wide | awk '{print $2}' | tail -n +2 | head -n $i`
+						echo "mario deployment status = ${ready24}"
+						if [[ "${ready24}" == "1/1" ]]
+						then	
+							echo -e "\e[1;32mScore => 10 \e[0m"
+						else
+							echo "Pod is not in running state."
+							echo -e "\e[1;31mScore => 0 \e[0m"
+						fi
+						done
+					else
+						echo "You not set 8080 port."
+						echo -e "\e[1;31mScore => 0 \e[0m"
+					fi
+					done
+				else
+					echo "You not set NodePort type."
+					echo -e "\e[1;31mScore => 0 \e[0m"
+				fi
+				done
+			else
+				echo "Service name mario not found."
+				echo -e "\e[1;31mScore => 0 \e[0m"
+			fi
+			done
+		else
+			echo "Deployment name mario not found."
+			echo -e "\e[1;31mScore => 0 \e[0m"
+		fi
+		done		
+	else
+		echo "You not use given image."
+		echo -e "\e[1;31mScore => 0 \e[0m"
+	fi
+	done
+
+	echo ""
+	echo "************************************************************************"
+	echo ""
+	echo "Q2 car racing game"
+	echo ""
+	echo "Time and date: $date"
+	echo ""
+	
+	for i in 1;do
+	ready25=`kubectl get deployments.apps car -o wide | awk '{print $1}' | tail -n +2 | head -n $i`
+	echo "Deployment name = ${ready25}"
+	if [[ "${ready25}" == "car" ]]
+	then
+		for i in 1;do
+		ready26=`kubectl get deployments.apps car -o wide | awk '{print $7}' | tail -n +2 | head -n $i`
+		echo "car deployment image name = ${ready26}"
+		if [[ "${ready26}" == "docker.io/playpalash/car-racing:01" ]]
+		then	
+			for i in 1;do
+			ready27=`kubectl get svc car | awk '{print $1}' | tail -n +2 | head -n $i`
+			echo "Service name = ${ready27}"
+			if [[ "${ready27}" == "car" ]]
+			then
+				for i in 1;do
+				ready28=`kubectl get svc car | awk '{print $2}' | tail -n +2 | head -n $i`
+				echo "Service Type = ${ready28}"
+				if [[ "${ready28}" == "NodePort" ]]
+				then
+					for i in 1;do
+					ready29=`kubectl get svc car | awk '{print $5}' | tail -n +2 | head -n $i`
+					echo "Service port = ${ready29:0:4}"
+					if [[ "${ready29:0:4}" == "8181" ]]
+					then
+						for i in 1;do
+						ready30=`kubectl get deployments.apps car -o wide | awk '{print $2}' | tail -n +2 | head -n $i`
+						echo "car deployment status = ${ready30}"
+						if [[ "${ready30}" == "1/1" ]]
+						then
+							echo -e "\e[1;32mScore => 10 \e[0m"
+						else
+							echo "Pod is not in running state."
+							echo -e "\e[1;31mScore => 0 \e[0m"
+						fi
+						done
+					else
+						echo "You not set 8181 port."
+						echo -e "\e[1;31mScore => 0 \e[0m"
+					fi
+					done
+				else
+					echo "You not set NodePort type."
+					echo -e "\e[1;31mScore => 0 \e[0m"
+				fi
+				done
+			else
+				echo "You not set service name as mario."
+				echo -e "\e[1;31mScore => 0 \e[0m"
+			fi
+			done
+		else
+			echo "You not set deployment name as mario."
+			echo -e "\e[1;31mScore => 0 \e[0m"
+		fi
+		done		
+	else
+		echo "You not use given image."
+		echo -e "\e[1;31mScore => 0 \e[0m"
+	fi
+	done
+else
+	echo "Please enter correct choice number!!"
+fi
